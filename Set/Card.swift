@@ -34,7 +34,7 @@ struct Card: Equatable {
     }
     
     let color: CardColors
-//    let numberOfSymbols: Int
+    let rank: Int
     let symbol: CardSymbols
     let shading: CardShadings
 }

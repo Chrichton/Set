@@ -28,7 +28,8 @@ enum Shading: Int {
 }
 
 @IBDesignable class PlayingCardView: UIView {
-    @IBInspectable var color: UIColor = UIColor.black
+    @IBInspectable var cardColor: UIColor = UIColor.white
+    @IBInspectable var suitColor: UIColor = UIColor.red
     @IBInspectable var suitAdapter: Int {
         get {
             return self.suit.rawValue
@@ -53,6 +54,7 @@ enum Shading: Int {
             self.shading = Shading(rawValue: shadingIndex) ?? .filled
         }
     }
+    
     var suit: Suit = .diamond
     var rank: Rank = .three
     var shading: Shading = .filled
@@ -85,7 +87,8 @@ enum Shading: Int {
     }
     
     private func createWrigglyPath(inRect: CGRect) -> UIBezierPath {
-        return UIBezierPath(ovalIn: inRect)
+        let circleRect = CGRect(x: inRect.minX + inRect.width / 2 - inRect.height / 2, y: inRect.minY, width: inRect.height, height: inRect.height)
+        return UIBezierPath(ovalIn: circleRect)
     }
     
     typealias DrawFunc = (CGRect) -> Void
@@ -110,7 +113,7 @@ enum Shading: Int {
                         currentContext.saveGState()
                     }
                     path.lineWidth = 2
-                    self.color.setStroke()
+                    self.suitColor.setStroke()
                     if self.shading == .striped {
                         path.addClip()
                         stride(from: rect.minX + path.lineWidth, to: rect.maxX, by: 4 * path.lineWidth)
@@ -124,7 +127,7 @@ enum Shading: Int {
                         currentContext.restoreGState()
                     }
                 case .filled:
-                    self.color.setFill()
+                    self.suitColor.setFill()
                     path.fill()
                 }
             }
@@ -166,7 +169,7 @@ enum Shading: Int {
     override func draw(_ rect: CGRect) {
         let roundedRect = UIBezierPath(roundedRect: rect, cornerRadius: 20)
         roundedRect.addClip()
-        UIColor.white.setFill()
+        cardColor.setFill()
         roundedRect.fill()
         
         drawSymbol(rect: rect)

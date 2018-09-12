@@ -21,10 +21,9 @@ struct Game {
         for color in Card.CardColors.allValues {
             for symbol in Card.CardSymbols.allValues {
                 for shading in Card.CardShadings.allValues {
-                    remainingDeck.append(Card(color: color, symbol: symbol, shading: shading))
-//                    for numberOfSymbols in 1...3 {
-//                        cards.append(Card(color: color, numberOfSymbols: numberOfSymbols, symbol: symbol, shading: shading))
-//                    }
+                    for rank in 1...3 {
+                        remainingDeck.append(Card(color: color, rank: rank, symbol: symbol, shading: shading))
+                    }
                 }
             }
         }
@@ -57,9 +56,9 @@ struct Game {
             if !selectedCards.contains(selectedCard) {
                 if matchedCards.contains(selectedCards[0]) && matchedCards.contains(selectedCards[1]) && matchedCards.contains(selectedCards[2]) {
                     for card in selectedCards {
-                        if !remainingDeck.isEmpty {
-                            if let index = cards.index(of: card) {
-                                cards.remove(at: index)
+                        if let index = cards.index(of: card) {
+                            cards.remove(at: index)
+                            if !remainingDeck.isEmpty {
                                 let remainingCard = remainingDeck.remove(at: 0)
                                 cards.insert(remainingCard, at: index)
                             }
@@ -96,10 +95,24 @@ struct Game {
         return nil
     }
     
+    mutating func drawCards() {
+        for _ in 1...3 {
+            if !remainingDeck.isEmpty {
+                let card = remainingDeck.remove(at: 0)
+                cards.append(card)
+            }
+        }
+    }
+    
+    var hasRemainingCards: Bool {
+        return remainingDeck.count > 0
+    }
+    
     private func isMatch(card1: Card, card2: Card, card3: Card) -> Bool {
-        return  card1.color != card2.color && card1.color != card3.color && card2.color != card3.color &&
-                card1.shading != card2.shading && card1.shading != card3.shading && card2.shading != card3.shading &&
-                card1.symbol != card2.symbol && card1.symbol != card3.symbol && card2.symbol != card3.symbol
+        return  (card1.color != card2.color && card1.color != card3.color && card2.color != card3.color) || (card1.color == card2.color && card2.color == card3.color) &&
+                (card1.shading != card2.shading && card1.shading != card3.shading && card2.shading != card3.shading) || (card1.shading == card2.shading && card2.shading == card3.shading) &&
+                (card1.symbol != card2.symbol && card1.symbol != card3.symbol && card2.symbol != card3.symbol) || (card1.symbol == card2.symbol && card2.symbol == card3.symbol)  &&
+                (card1.rank != card2.rank && card1.rank != card3.rank && card2.rank != card3.rank) || (card1.rank == card2.rank && card2.rank == card3.rank)
     }
     
     private func shuffleCards(_ cards: [Card]) -> [Card] {

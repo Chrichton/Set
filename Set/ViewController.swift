@@ -9,10 +9,11 @@
 import UIKit
 
 class ViewController: UIViewController {
-    
-    @IBAction func touchCard(_ sender: UIButton) {
-        if let cardNumber = cardButtons.index(of: sender) {
-            game.selectCard(atIndex: cardNumber)
+    @objc
+    func touchCard(_ sender: UITapGestureRecognizer) {
+        if let tappedView = sender.view {
+            let index = tappedView.tag
+            game.selectCard(atIndex: index)
             updateViewFromModel()
         }
     }
@@ -21,14 +22,25 @@ class ViewController: UIViewController {
         startMatchFinder()
     }
     
-    @IBOutlet var cardButtons: [UIButton]!
+    @IBAction func moreCards(_ sender: UIButton) {
+        game.drawCards()
+        updateViewFromModel()
+    }
     
-    var game: Game!
+    @IBAction func newGame(_ sender: UIButton) {
+        game = Game()
+        updateViewFromModel()
+    }
+    
+    @IBOutlet var moreCardsButton: UIButton!
+    @IBOutlet var playingCardsView: UIView!
+    
+    lazy var game: Game = Game()
+    lazy var grid = Grid(layout: .aspectRatio(5.0 / 8.0), frame: playingCardsView.bounds)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        game = Game()
         updateViewFromModel()
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -37,64 +49,55 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     private func updateViewFromModel() {
+        removeOldPlayingCardViews()
+        grid.cellCount = game.cards.count
         for (index, card) in game.cards.enumerated() {
-            let buttonText = cardToButtonText(card)
-            let cardButton = cardButtons[index]
-            cardButton.setAttributedTitle(buttonText, for: .normal)
-            
-            if game.selectedCards.contains(card) {
-                cardButton.layer.borderWidth = 3
-                if game.matchedCards.contains(card) {
-                   cardButton.layer.borderColor = UIColor.green.cgColor
-                } else {
-                    cardButton.layer.borderColor = UIColor.blue.cgColor
+            if let frame = grid[index] {
+                let cardView = PlayingCardView(frame: frame.insetBy(dx: 3, dy: 3))
+                switch card.color {
+                case .color1: cardView.suitColor = UIColor.red
+                case .color2: cardView.suitColor = UIColor.blue
+                case .color3: cardView.suitColor = UIColor.green
                 }
-            } else {
-                cardButton.layer.borderWidth = 0
+                switch card.shading {
+                case .shading1: cardView.shading = .filled
+                case .shading2: cardView.shading = .open
+                case .shading3: cardView.shading = .striped
+                }
+                switch card.symbol {
+                case .symbol1 : cardView.suit = .diamond
+                case .symbol2: cardView.suit = .oval
+                case .symbol3: cardView.suit = .squiggle
+                }
+                cardView.rank = Rank(rawValue: card.rank) ?? .one
+                
+                if game.selectedCards.contains(card) {
+                    if game.matchedCards.contains(card) {
+                        cardView.cardColor = #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)
+                    } else {
+                        cardView.cardColor = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
+                    }
+                } else {
+                    cardView.cardColor = UIColor.white
+                }
+                
+                let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(touchCard(_:)))
+                cardView.addGestureRecognizer(tapGestureRecognizer)
+                cardView.tag = index
+                playingCardsView.addSubview(cardView)
+                moreCardsButton.isEnabled = game.hasRemainingCards
             }
-        }
-        
-        for i in game.cards.count ..< cardButtons.count {
-            cardButtons[i].backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         }
     }
     
-    private func cardToButtonText(_ card: Card) -> NSAttributedString {
-        var symbol: String!
-        switch card.symbol {
-        case .symbol1:
-            symbol = "▲"
-        case .symbol2:
-            symbol = "●"
-        case .symbol3:
-            symbol = "◼︎"
+    private func removeOldPlayingCardViews() {
+        for view in playingCardsView.subviews {
+            if view is PlayingCardView {
+                view.removeFromSuperview()
+            }
         }
-        
- //       let string = String(repeating: symbol, count: card.numberOfSymbols)
-        
-        var attributes = [NSAttributedStringKey : Any]()
-        
-        switch card.color {
-        case .color1:
-            attributes[NSAttributedStringKey.foregroundColor] = UIColor.red
-        case .color2:
-            attributes[NSAttributedStringKey.foregroundColor] = UIColor.green
-        case .color3:
-            attributes[NSAttributedStringKey.foregroundColor] = UIColor.yellow
-        }
-        
-        switch card.shading {
-        case .shading1:
-            attributes[NSAttributedStringKey.strokeWidth] = 10  // Outline
-        case .shading2:
-            () // Solid
-        case .shading3:
-            attributes[NSAttributedStringKey.foregroundColor] = (attributes[NSAttributedStringKey.foregroundColor] as! UIColor).withAlphaComponent(0.35)
-        }
-        
-        return NSAttributedString(string: symbol, attributes: attributes)
     }
     
     private func startMatchFinder() {
