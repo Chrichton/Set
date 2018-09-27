@@ -162,10 +162,6 @@ enum Shading: Int {
         }
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
-    
     override func draw(_ rect: CGRect) {
         let roundedRect = UIBezierPath(roundedRect: rect, cornerRadius: 20)
         roundedRect.addClip()

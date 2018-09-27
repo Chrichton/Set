@@ -22,9 +22,16 @@ class ViewController: UIViewController {
         startMatchFinder()
     }
     
-    @IBAction func moreCards(_ sender: UIButton) {
-        game.drawCards()
+    @IBAction func deal3Cards(_ sender: UISwipeGestureRecognizer) {
+        game.deal3Cards()
         updateViewFromModel()
+    }
+    
+    @IBAction func shuffleCards(_ sender: UIRotationGestureRecognizer) {
+        if game.hasRemainingCards && sender.state == .ended {
+            game.reshuffleCards()
+            updateViewFromModel()
+        }
     }
     
     @IBAction func newGame(_ sender: UIButton) {
@@ -32,11 +39,10 @@ class ViewController: UIViewController {
         updateViewFromModel()
     }
     
-    @IBOutlet var moreCardsButton: UIButton!
     @IBOutlet var playingCardsView: UIView!
     
     lazy var game: Game = Game()
-    lazy var grid = Grid(layout: .aspectRatio(5.0 / 8.0), frame: playingCardsView.bounds)
+    lazy var grid = createGrid()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +56,19 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    private func createGrid() -> Grid {
+        return Grid(layout: .aspectRatio(5.0 / 8.0), frame: playingCardsView.bounds)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        if grid.frame != playingCardsView.bounds {
+            grid = createGrid()
+            updateViewFromModel()
+        }
+    }
+
     private func updateViewFromModel() {
         removeOldPlayingCardViews()
         grid.cellCount = game.cards.count
@@ -87,7 +106,6 @@ class ViewController: UIViewController {
                 cardView.addGestureRecognizer(tapGestureRecognizer)
                 cardView.tag = index
                 playingCardsView.addSubview(cardView)
-                moreCardsButton.isEnabled = game.hasRemainingCards
             }
         }
     }
