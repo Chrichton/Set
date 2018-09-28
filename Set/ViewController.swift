@@ -41,7 +41,7 @@ class ViewController: UIViewController {
         updateViewFromModel()
     }
     
-    @IBAction func playerSelected(_ sender: UISegmentedControl) {
+    @IBAction func playerWasSelected(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
             actualPlayer = .playerOne
         } else {
@@ -52,14 +52,39 @@ class ViewController: UIViewController {
     @IBOutlet var playingCardsView: UIView!
     @IBOutlet var scorePlayer1: UILabel!
     @IBOutlet var scorePlayer2: UILabel!
+    @IBOutlet var selectedPlayerControl: UISegmentedControl!
     
     lazy var game: Game = Game()
     lazy var grid = createGrid()
     var scorer = TwoPlayerScorer()
     var actualPlayer = TwoPlayerScorer.Players.playerOne
+    var timerInterval = 10.0
+    var timer: Timer?
+        
+    private func createSwitchPlayerTimer() -> Timer {
+        let newTimer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: false) { timer in
+            self.switchPlayers()
+            DispatchQueue.main.async {
+                if self.selectedPlayerControl.selectedSegmentIndex == 0 {
+                    self.selectedPlayerControl.selectedSegmentIndex = 1
+                } else {
+                    self.selectedPlayerControl.selectedSegmentIndex = 0
+                }
+                let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default) { alertAction in
+                        self.timer = self.createSwitchPlayerTimer()
+                    })
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+        
+        return newTimer
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        timer = createSwitchPlayerTimer()
         
         updateViewFromModel()
         // Do any additional setup after loading the view, typically from a nib.

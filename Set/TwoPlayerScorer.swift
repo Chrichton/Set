@@ -9,9 +9,9 @@
 import Foundation
 
 struct TwoPlayerScorer {
-    enum Players {
-        case playerOne
-        case playerTwo
+    enum Players: String {
+        case playerOne = "Spieler1"
+        case playerTwo = "Spieler2"
     }
     
     private (set) var PlayerOneScore = 0

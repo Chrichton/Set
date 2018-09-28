@@ -62,7 +62,7 @@
                                         </segments>
                                         <color key="tintColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
-                                            <action selector="playerSelected:" destination="BYZ-38-t0r" eventType="valueChanged" id="V1k-bk-HU4"/>
+                                            <action selector="playerWasSelected:" destination="BYZ-38-t0r" eventType="valueChanged" id="V1k-bk-HU4"/>
                                         </connections>
                                     </segmentedControl>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zWX-oX-xyp">
@@ -107,6 +107,7 @@
                         <outlet property="playingCardsView" destination="nux-wO-JbN" id="U4n-Hf-y91"/>
                         <outlet property="scorePlayer1" destination="VMc-pj-84r" id="GJH-dx-rCZ"/>
                         <outlet property="scorePlayer2" destination="3Pp-tg-VU1" id="bqK-SQ-vtV"/>
+                        <outlet property="selectedPlayerControl" destination="25a-5q-sPw" id="lBc-pY-fQ2"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
