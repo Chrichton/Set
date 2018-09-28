@@ -14,8 +14,20 @@ class ViewController: UIViewController {
         if let tappedView = sender.view {
             let index = tappedView.tag
             game.selectCard(atIndex: index)
-            scorer.playerDidDraw(player: actualPlayer, for: game)
-            updateViewFromModel()
+            if scorer.playerDidDraw(player: actualPlayer, for: game) {
+                timer?.invalidate()
+                updateViewFromModel()
+                timerInterval = minimumTimerInterval
+                switchPlayers()
+                let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default){ alertAction in
+                    self.timer = self.createSwitchPlayerTimer()
+                })
+                self.present(alert, animated: true, completion: nil)
+                
+            } else {
+                updateViewFromModel()
+            }
         }
     }
    
@@ -54,16 +66,18 @@ class ViewController: UIViewController {
     @IBOutlet var scorePlayer2: UILabel!
     @IBOutlet var selectedPlayerControl: UISegmentedControl!
     
+    let  minimumTimerInterval = 10.0
     lazy var game: Game = Game()
     lazy var grid = createGrid()
     var scorer = TwoPlayerScorer()
     var actualPlayer = TwoPlayerScorer.Players.playerOne
-    var timerInterval = 10.0
+    lazy var timerInterval = minimumTimerInterval
     var timer: Timer?
         
     private func createSwitchPlayerTimer() -> Timer {
         let newTimer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: false) { timer in
             self.switchPlayers()
+            self.timerInterval *= 2
             DispatchQueue.main.async {
                 if self.selectedPlayerControl.selectedSegmentIndex == 0 {
                     self.selectedPlayerControl.selectedSegmentIndex = 1

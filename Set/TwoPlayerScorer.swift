@@ -16,7 +16,7 @@ struct TwoPlayerScorer {
     
     private (set) var PlayerOneScore = 0
     private (set) var PlayerTwoScore = 0
-    mutating func playerDidDraw(player: Players, for game: Game) {
+    mutating func playerDidDraw(player: Players, for game: Game) -> Bool {
         if let newScore = getNewScore(game: game) {
             switch player {
             case .playerOne:
@@ -24,7 +24,10 @@ struct TwoPlayerScorer {
             case .playerTwo:
                 PlayerTwoScore += newScore
             }
+            return true
         }
+        
+        return false
     }
     
     private func getNewScore(game: Game) -> Int? {
