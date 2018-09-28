@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF832D92215E8A6B00CA9B43 /* TwoPlayerScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF832D91215E8A6B00CA9B43 /* TwoPlayerScorer.swift */; };
 		FFAE12832137E6B100145FFE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFAE12822137E6B100145FFE /* AppDelegate.swift */; };
 		FFAE12852137E6B100145FFE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFAE12842137E6B100145FFE /* ViewController.swift */; };
 		FFAE12882137E6B100145FFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFAE12862137E6B100145FFE /* Main.storyboard */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		FF832D91215E8A6B00CA9B43 /* TwoPlayerScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPlayerScorer.swift; sourceTree = "<group>"; };
 		FFAE127F2137E6B100145FFE /* Set.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Set.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFAE12822137E6B100145FFE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFAE12842137E6B100145FFE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 				FFAE12962137E85E00145FFE /* Set.swift */,
 				FFB5E2B8213FCDE9001041BA /* PlayingCardView.swift */,
 				FFD559932147E0EA00BF80ED /* Grid.swift */,
+				FF832D91215E8A6B00CA9B43 /* TwoPlayerScorer.swift */,
 			);
 			path = Set;
 			sourceTree = "<group>";
@@ -149,6 +152,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFAE12852137E6B100145FFE /* ViewController.swift in Sources */,
+				FF832D92215E8A6B00CA9B43 /* TwoPlayerScorer.swift in Sources */,
 				FFAE12952137E6F900145FFE /* Card.swift in Sources */,
 				FFAE12832137E6B100145FFE /* AppDelegate.swift in Sources */,
 				FFB5E2B9213FCDE9001041BA /* PlayingCardView.swift in Sources */,

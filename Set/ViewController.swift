@@ -14,6 +14,7 @@ class ViewController: UIViewController {
         if let tappedView = sender.view {
             let index = tappedView.tag
             game.selectCard(atIndex: index)
+            scorer.playerDidDraw(player: actualPlayer, for: game)
             updateViewFromModel()
         }
     }
@@ -36,13 +37,26 @@ class ViewController: UIViewController {
     
     @IBAction func newGame(_ sender: UIButton) {
         game = Game()
+        scorer = TwoPlayerScorer()
         updateViewFromModel()
     }
     
+    @IBAction func playerSelected(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            actualPlayer = .playerOne
+        } else {
+            actualPlayer = .playerTwo
+        }
+    }
+    
     @IBOutlet var playingCardsView: UIView!
+    @IBOutlet var scorePlayer1: UILabel!
+    @IBOutlet var scorePlayer2: UILabel!
     
     lazy var game: Game = Game()
     lazy var grid = createGrid()
+    var scorer = TwoPlayerScorer()
+    var actualPlayer = TwoPlayerScorer.Players.playerOne
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,6 +86,9 @@ class ViewController: UIViewController {
     private func updateViewFromModel() {
         removeOldPlayingCardViews()
         grid.cellCount = game.cards.count
+        scorePlayer1.text = String(format: "%2d", scorer.PlayerOneScore)
+        scorePlayer2.text = String(format: "%2d", scorer.PlayerTwoScore)
+        
         for (index, card) in game.cards.enumerated() {
             if let frame = grid[index] {
                 let cardView = PlayingCardView(frame: frame.insetBy(dx: 3, dy: 3))
@@ -110,6 +127,15 @@ class ViewController: UIViewController {
         }
     }
     
+    private func switchPlayers() {
+        switch actualPlayer {
+        case .playerOne:
+            actualPlayer = .playerTwo
+        case .playerTwo:
+            actualPlayer = .playerOne
+        }
+    }
+    
     private func removeOldPlayingCardViews() {
         for view in playingCardsView.subviews {
             if view is PlayingCardView {
@@ -124,6 +150,7 @@ class ViewController: UIViewController {
             if let matchingCards = self.game.findMatchingCards() {
                 DispatchQueue.main.async {
                     self.game.selectMatchingCards(matchingCards)
+                    self.scorer.playerDidDraw(player: self.actualPlayer, for: self.game)
                     self.updateViewFromModel()
                 }
             }
