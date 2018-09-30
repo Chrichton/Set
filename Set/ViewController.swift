@@ -9,6 +9,11 @@
 import UIKit
 
 class ViewController: UIViewController {
+    enum GameType {
+        case onePlayer
+        case twoPlayers
+    }
+    
     @objc
     func touchCard(_ sender: UITapGestureRecognizer) {
         if let tappedView = sender.view {
@@ -67,18 +72,31 @@ class ViewController: UIViewController {
     
     let  minimumTimerInterval = 10.0
     var game: Game!
-    var grid: Grid!
+    var grid: Grid?
     var scorer: TwoPlayerScorer!
-    var actualPlayer = TwoPlayerScorer.Players.playerOne
+    var actualPlayer = TwoPlayerScorer.Player.playerOne
     var timerInterval: Double!
     var timer: Timer!
+    var gameType: GameType!
     
     private func createNewGame() -> Game {
         let newGame = Game()
         scorer = TwoPlayerScorer()
         grid = createGrid()
         timerInterval = minimumTimerInterval
-        timer = createSwitchPlayerTimer()
+        
+        let alert = UIAlertController(title: "Anzahl Spieler", message: "Wieviele Spieler nehmen teil?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "1", style: .cancel) { alertAction in
+            self.gameType = .onePlayer
+            self.selectedPlayerControl.isHidden = true
+        })
+        alert.addAction(UIAlertAction(title: "2", style: .default) { alertAction in
+            self.gameType = .twoPlayers
+            self.selectedPlayerControl.isHidden = false
+            self.timer = self.createSwitchPlayerTimer()
+        })
+        self.present(alert, animated: true, completion: nil)
+        
         return newGame
     }
     
@@ -93,7 +111,7 @@ class ViewController: UIViewController {
                 } else {
                     self.selectedPlayerControl.selectedSegmentIndex = 0
                 }
-                let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: UIAlertController.Style.alert)
+                let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default) { alertAction in
                         self.playingCardsView.isHidden = false
                         self.timer = self.createSwitchPlayerTimer()
@@ -105,8 +123,8 @@ class ViewController: UIViewController {
         return newTimer
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
         game = createNewGame()
         updateViewFromModel()
@@ -124,7 +142,7 @@ class ViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        if grid.frame != playingCardsView.bounds {
+        if grid != nil && grid?.frame != playingCardsView.bounds {
             grid = createGrid()
             updateViewFromModel()
         }
@@ -132,12 +150,12 @@ class ViewController: UIViewController {
 
     private func updateViewFromModel() {
         removePlayingCardViews()
-        grid.cellCount = game.cards.count
+        grid?.cellCount = game.cards.count
         scorePlayer1.text = String(format: "%2d", scorer.PlayerOneScore)
         scorePlayer2.text = String(format: "%2d", scorer.PlayerTwoScore)
         
         for (index, card) in game.cards.enumerated() {
-            if let frame = grid[index] {
+            if let frame = grid?[index] {
                 let cardView = PlayingCardView(frame: frame.insetBy(dx: 3, dy: 3))
                 switch card.color {
                 case .color1: cardView.suitColor = UIColor.red
@@ -204,4 +222,3 @@ class ViewController: UIViewController {
         }
     }
 }
-
