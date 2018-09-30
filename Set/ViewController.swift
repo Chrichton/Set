@@ -20,16 +20,19 @@ class ViewController: UIViewController {
             let index = tappedView.tag
             game.selectCard(atIndex: index)
             if scorer.updateScore(player: actualPlayer, for: game) {
-                timer.invalidate()
-                updateViewFromModel()
-                timerInterval = minimumTimerInterval
-                switchPlayers()
-                let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default){ alertAction in
-                    self.timer = self.createSwitchPlayerTimer()
-                })
-                self.present(alert, animated: true, completion: nil)
-                
+                if timer != nil {
+                    timer?.invalidate()
+                    updateViewFromModel()
+                    timerInterval = minimumTimerInterval
+                    switchPlayers()
+                    let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default){ alertAction in
+                        self.timer = self.createSwitchPlayerTimer()
+                    })
+                    self.present(alert, animated: true, completion: nil)
+                } else {
+                    updateViewFromModel()
+                }
             } else {
                 updateViewFromModel()
             }
@@ -77,7 +80,7 @@ class ViewController: UIViewController {
     var scorer: TwoPlayerScorer!
     var actualPlayer = TwoPlayerScorer.Player.playerOne
     var timerInterval: Double!
-    var timer: Timer!
+    var timer: Timer?
     var gameType: GameType!
     
     private func createNewGame() -> Game {
