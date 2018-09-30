@@ -48,8 +48,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func newGame(_ sender: UIButton) {
-        game = Game()
-        scorer = TwoPlayerScorer()
+        game = createNewGame()
         updateViewFromModel()
     }
     
@@ -67,13 +66,22 @@ class ViewController: UIViewController {
     @IBOutlet var selectedPlayerControl: UISegmentedControl!
     
     let  minimumTimerInterval = 10.0
-    lazy var game: Game = Game()
-    lazy var grid = createGrid()
-    var scorer = TwoPlayerScorer()
+    var game: Game!
+    var grid: Grid!
+    var scorer: TwoPlayerScorer!
     var actualPlayer = TwoPlayerScorer.Players.playerOne
-    lazy var timerInterval = minimumTimerInterval
+    var timerInterval: Double!
     var timer: Timer?
-        
+    
+    private func createNewGame() -> Game {
+        let newGame = Game()
+        scorer = TwoPlayerScorer()
+        grid = createGrid()
+        timerInterval = minimumTimerInterval
+        timer = createSwitchPlayerTimer()
+        return newGame
+    }
+    
     private func createSwitchPlayerTimer() -> Timer {
         let newTimer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: false) { timer in
             self.switchPlayers()
@@ -98,10 +106,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        timer = createSwitchPlayerTimer()
-        
+        game = createNewGame()
         updateViewFromModel()
-        // Do any additional setup after loading the view, typically from a nib.
     }
 
     override func didReceiveMemoryWarning() {
@@ -189,7 +195,7 @@ class ViewController: UIViewController {
             if let matchingCards = self.game.findMatchingCards() {
                 DispatchQueue.main.async {
                     self.game.selectMatchingCards(matchingCards)
-                    self.scorer.playerDidDraw(player: self.actualPlayer, for: self.game)
+                    let _ = self.scorer.playerDidDraw(player: self.actualPlayer, for: self.game)
                     self.updateViewFromModel()
                 }
             }
