@@ -69,6 +69,7 @@ class ViewController: UIViewController {
     @IBOutlet var scorePlayer1: UILabel!
     @IBOutlet var scorePlayer2: UILabel!
     @IBOutlet var selectedPlayerControl: UISegmentedControl!
+    @IBOutlet var player2Score: UIStackView!
     
     let  minimumTimerInterval = 10.0
     var game: Game!
@@ -88,11 +89,14 @@ class ViewController: UIViewController {
         let alert = UIAlertController(title: "Anzahl Spieler", message: "Wieviele Spieler nehmen teil?", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "1", style: .cancel) { alertAction in
             self.gameType = .onePlayer
+            self.actualPlayer = .playerOne
             self.selectedPlayerControl.isHidden = true
+            self.player2Score.isHidden = true
         })
         alert.addAction(UIAlertAction(title: "2", style: .default) { alertAction in
             self.gameType = .twoPlayers
             self.selectedPlayerControl.isHidden = false
+            self.player2Score.isHidden = false
             self.timer = self.createSwitchPlayerTimer()
         })
         self.present(alert, animated: true, completion: nil)

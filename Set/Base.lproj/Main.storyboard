@@ -54,7 +54,7 @@
                                             <action selector="findMatch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="77B-Cj-rAn"/>
                                         </connections>
                                     </button>
-                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="25a-5q-sPw">
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="25a-5q-sPw">
                                         <rect key="frame" x="133.5" y="0.0" width="61" height="31"/>
                                         <segments>
                                             <segment title="P1"/>
@@ -104,6 +104,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="player2Score" destination="YSM-uX-h4g" id="XTh-as-acL"/>
                         <outlet property="playingCardsView" destination="nux-wO-JbN" id="U4n-Hf-y91"/>
                         <outlet property="scorePlayer1" destination="VMc-pj-84r" id="GJH-dx-rCZ"/>
                         <outlet property="scorePlayer2" destination="3Pp-tg-VU1" id="bqK-SQ-vtV"/>
