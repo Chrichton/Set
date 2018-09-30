@@ -14,8 +14,8 @@ class ViewController: UIViewController {
         if let tappedView = sender.view {
             let index = tappedView.tag
             game.selectCard(atIndex: index)
-            if scorer.playerDidDraw(player: actualPlayer, for: game) {
-                timer?.invalidate()
+            if scorer.updateScore(player: actualPlayer, for: game) {
+                timer.invalidate()
                 updateViewFromModel()
                 timerInterval = minimumTimerInterval
                 switchPlayers()
@@ -71,7 +71,7 @@ class ViewController: UIViewController {
     var scorer: TwoPlayerScorer!
     var actualPlayer = TwoPlayerScorer.Players.playerOne
     var timerInterval: Double!
-    var timer: Timer?
+    var timer: Timer!
     
     private func createNewGame() -> Game {
         let newGame = Game()
@@ -87,6 +87,7 @@ class ViewController: UIViewController {
             self.switchPlayers()
             self.timerInterval *= 2
             DispatchQueue.main.async {
+                self.playingCardsView.isHidden = true
                 if self.selectedPlayerControl.selectedSegmentIndex == 0 {
                     self.selectedPlayerControl.selectedSegmentIndex = 1
                 } else {
@@ -94,6 +95,7 @@ class ViewController: UIViewController {
                 }
                 let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: UIAlertController.Style.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default) { alertAction in
+                        self.playingCardsView.isHidden = false
                         self.timer = self.createSwitchPlayerTimer()
                     })
                 self.present(alert, animated: true, completion: nil)
@@ -129,7 +131,7 @@ class ViewController: UIViewController {
     }
 
     private func updateViewFromModel() {
-        removeOldPlayingCardViews()
+        removePlayingCardViews()
         grid.cellCount = game.cards.count
         scorePlayer1.text = String(format: "%2d", scorer.PlayerOneScore)
         scorePlayer2.text = String(format: "%2d", scorer.PlayerTwoScore)
@@ -181,7 +183,7 @@ class ViewController: UIViewController {
         }
     }
     
-    private func removeOldPlayingCardViews() {
+    private func removePlayingCardViews() {
         for view in playingCardsView.subviews {
             if view is PlayingCardView {
                 view.removeFromSuperview()
@@ -195,7 +197,7 @@ class ViewController: UIViewController {
             if let matchingCards = self.game.findMatchingCards() {
                 DispatchQueue.main.async {
                     self.game.selectMatchingCards(matchingCards)
-                    let _ = self.scorer.playerDidDraw(player: self.actualPlayer, for: self.game)
+                    let _ = self.scorer.updateScore(player: self.actualPlayer, for: self.game)
                     self.updateViewFromModel()
                 }
             }
