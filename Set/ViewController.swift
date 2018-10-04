@@ -80,10 +80,11 @@ class ViewController: UIViewController {
     var scorer: TwoPlayerScorer!
     var actualPlayer = TwoPlayerScorer.Player.playerOne
     var timerInterval: Double!
-    var timer: Timer?
+    weak var timer: Timer?
     var gameType: GameType!
     
     private func createNewGame() -> Game {
+        timer?.invalidate()
         let newGame = Game()
         scorer = TwoPlayerScorer()
         grid = createGrid()
