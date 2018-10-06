@@ -19,10 +19,11 @@ struct Game {
     
     let noOfCardsAtStart = 12
     
-    init() {
-        for color in Card.CardColors.allValues {
-            for symbol in Card.CardSymbols.allValues {
-                for shading in Card.CardShadings.allValues {
+    // TODO
+    init() { // Cartesian Product
+        for color in Card.CardColors.allCases {
+            for symbol in Card.CardSymbols.allCases {
+                for shading in Card.CardShadings.allCases {
                     for rank in 1...3 {
                         remainingDeck.append(Card(color: color, rank: rank, symbol: symbol, shading: shading))
                     }
