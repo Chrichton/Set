@@ -13,6 +13,8 @@ enum Suit: Int {
     case diamond
     case oval
     case squiggle
+    
+    // func createPath TODO
 }
 
 enum Rank: Int {
@@ -26,6 +28,17 @@ enum Shading: Int {
     case open
     case striped
 }
+
+extension Card.CardColors {
+    func getUIColor() -> UIColor {
+        switch self {
+        case .color1: return UIColor.red
+        case .color2: return UIColor.green
+        case .color3: return UIColor.blue
+        }
+    }
+}
+// suitColor als enum
 
 @IBDesignable class PlayingCardView: UIView {
     @IBInspectable var cardColor: UIColor = UIColor.white
@@ -108,7 +121,7 @@ enum Shading: Int {
                 let path = self.createSuitPath(inRect: rect)
                 
                 switch self.shading {
-                case .open, .striped:
+                case .open, .striped: // 2 Fälle für .open, .striped TODO
                     if let currentContext = UIGraphicsGetCurrentContext() {
                         currentContext.saveGState()
                     }
@@ -147,12 +160,12 @@ enum Shading: Int {
         case .one:
             let symbolRect = CGRect(x: x, y: rect.minY + 2 / partitionY * rect.height, width: width , height: height)
             drawFunc(symbolRect)
-        case .two:
+        case .two: // Nur oberes Rect bestimmen und dann um dieselbe Höhe y verschieben
             let symbolRectUp = CGRect(x: x, y: rect.minY + (2 / partitionY - 1 / (2 * partitionY) - symbolsPadding) * rect.height, width: width, height: height)
             drawFunc(symbolRectUp)
             let symbolRectDown = CGRect(x: x, y: rect.minY + (2 / partitionY + 1 / (2 * partitionY) + symbolsPadding) * rect.height, width: width, height: height)
             drawFunc(symbolRectDown)
-        case .three:
+        case .three: // TODO Sequence von drawFuncs
             let symbolRectUp = CGRect(x: x, y: rect.minY + (1 / partitionY  - symbolsPadding) * rect.height, width: width, height: height)
             drawFunc(symbolRectUp)
             let symbolMidddle = CGRect(x: x, y: rect.minY + 2 / partitionY * rect.height, width: width , height: height)
@@ -162,12 +175,15 @@ enum Shading: Int {
         }
     }
     
-    override func draw(_ rect: CGRect) {
+    fileprivate func drawCardBackground(_ rect: CGRect) {
         let roundedRect = UIBezierPath(roundedRect: rect, cornerRadius: 20)
         roundedRect.addClip()
         cardColor.setFill()
         roundedRect.fill()
-        
+    }
+    
+    override func draw(_ rect: CGRect) {
+        drawCardBackground(rect)
         drawSymbol(rect: rect)
     }
 }

@@ -8,19 +8,20 @@
 
 import Foundation
 
-typealias MatchingCards = (card1: Card, card2: Card, card3: Card)
-
 struct Game {
+    typealias MatchingCards = (card1: Card, card2: Card, card3: Card)
+    
     private (set) var cards = [Card]()
-
-    private var remainingDeck = [Card]()
     private (set) var selectedCards = [Card]()
     private (set) var matchedCards  = [Card]()
+    private (set) var scorer: ScoringProtocol
+    private (set) var players = CircularSequence<Player>()
     
-    let noOfCardsAtStart = 12
+    private var remainingDeck = [Card]()
+    private let noOfCardsAtStart = 12
     
-    // TODO
-    init() { // Cartesian Product
+        // TODO
+    init(numberOfPlayers: Int) { // Cartesian Product
         for color in Card.CardColors.allCases {
             for symbol in Card.CardSymbols.allCases {
                 for shading in Card.CardShadings.allCases {
@@ -31,9 +32,27 @@ struct Game {
             }
         }
         
+        
+        scorer = TwoPlayerScorer()
+        
         remainingDeck = shuffleCards(remainingDeck)
         for _ in 1...noOfCardsAtStart {
             cards.append(remainingDeck.remove(at: 0))
+        }
+        
+        for playerNumber in 1...numberOfPlayers {
+            players.append(Player(name: "Spieler\(playerNumber)", score: 0))
+        }
+    }
+    
+    mutating func nextPlayer() -> Void {
+        let _ = players.next()
+    }
+    
+    private mutating func updateScore() {
+        if let newScore = scorer.getNewScore(for: self), let player = players.current() {
+            let newPlayer = Player(name: player.name, score: player.score + newScore)
+            players.setValue(atIndex: players.position, to: newPlayer)
         }
     }
     
@@ -72,16 +91,19 @@ struct Game {
                 selectedCards.append(selectedCard)
             }
         }
+        
+        updateScore()
     }
     
     mutating func selectMatchingCards(_ matchingCards: MatchingCards)  {
-            let matchingCardsArray = [matchingCards.card1, matchingCards.card2, matchingCards.card3]
-            selectedCards.removeAll()
-            selectedCards.append(contentsOf: matchingCardsArray)
-            matchedCards.append(contentsOf: matchingCardsArray)
+        let matchingCardsArray = [matchingCards.card1, matchingCards.card2, matchingCards.card3]
+        selectedCards.removeAll()
+        selectedCards.append(contentsOf: matchingCardsArray)
+        matchedCards.append(contentsOf: matchingCardsArray)
+        updateScore()
     }
     
-    func findMatchingCards() -> MatchingCards? {
+    mutating func findMatchingCards() -> MatchingCards? {
         for index1 in 0 ..< cards.count - 2 {
             for index2 in index1 + 1 ..< cards.count - 1 {
                 for index3 in index2 + 1 ..< cards.count {

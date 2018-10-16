@@ -8,34 +8,22 @@
 
 import Foundation
 
-struct TwoPlayerScorer {
-    enum Player: String {
-        case playerOne = "Spieler1"
-        case playerTwo = "Spieler2"
-    }
+struct TwoPlayerScorer: ScoringProtocol {
+    private var newScore = false
     
-    private (set) var PlayerOneScore = 0
-    private (set) var PlayerTwoScore = 0
-    mutating func updateScore(player: Player, for game: Game) -> Bool {
-        if let newScore = getNewScore(game: game) {
-            switch player {
-            case .playerOne:
-                PlayerOneScore += newScore
-            case .playerTwo:
-                PlayerTwoScore += newScore
-            }
-            return true
-        }
+    var hasNewScore: Bool {
+        get { return newScore }
+    }
         
-        return false
-    }
-    
-    private func getNewScore(game: Game) -> Int? {
+    // Strategy TODO
+    mutating func getNewScore(for game: Game) -> Int? {
         if game.selectedCards.count == 3 &&
             game.selectedCards.allSatisfy{selectedCard in game.matchedCards.contains(selectedCard)} {
+            newScore = true
             return 1
         }
         
+        newScore = false
         return nil
     }
 }

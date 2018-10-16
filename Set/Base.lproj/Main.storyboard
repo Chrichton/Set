@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FE6-25-sdk">
     <device id="retina4_0" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -10,16 +10,59 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Select No Of Players View Controller-->
+        <scene sceneID="TcH-HH-CRt">
+            <objects>
+                <viewController id="URa-Aj-ATY" customClass="SelectNoOfPlayersViewController" customModule="Set" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="GTN-HM-cAE">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="dFJ-vg-gFI">
+                                <rect key="frame" x="103.5" y="268" width="113" height="96"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J3Q-WF-7Xx">
+                                        <rect key="frame" x="0.0" y="0.0" width="113" height="48"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                        <state key="normal" title="1 Spieler"/>
+                                        <connections>
+                                            <segue destination="BYZ-38-t0r" kind="show" identifier="SelectOnePlayerSegue" id="GY3-Yx-tht"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nOb-Ce-BCe">
+                                        <rect key="frame" x="0.0" y="48" width="113" height="48"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                        <state key="normal" title="2 Spieler"/>
+                                        <connections>
+                                            <segue destination="BYZ-38-t0r" kind="show" identifier="SelectTwoPlayersSegue" id="iaZ-fF-2fa"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="dFJ-vg-gFI" firstAttribute="centerY" secondItem="Hp7-tN-I72" secondAttribute="centerY" id="PwQ-vo-Trf"/>
+                            <constraint firstItem="dFJ-vg-gFI" firstAttribute="centerX" secondItem="Hp7-tN-I72" secondAttribute="centerX" id="se7-h3-3mp"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Hp7-tN-I72"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="aeW-uB-UAO"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="e00-ub-WE9" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="206.25" y="121.47887323943662"/>
+        </scene>
+        <!--Game View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Set" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="GameViewController" customModule="Set" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="nux-wO-JbN">
-                                <rect key="frame" x="16" y="20" width="288" height="478"/>
+                                <rect key="frame" x="16" y="64" width="288" height="434"/>
                                 <gestureRecognizers/>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="fuT-wy-aOm" appends="YES" id="YB7-DD-mvE"/>
@@ -27,7 +70,7 @@
                                 </connections>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="wKi-aE-qts">
-                                <rect key="frame" x="3" y="518" width="314" height="30"/>
+                                <rect key="frame" x="3.5" y="518" width="313.5" height="30"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yuV-JL-DbQ">
                                         <rect key="frame" x="0.0" y="0.0" width="68.5" height="30"/>
@@ -54,19 +97,14 @@
                                             <action selector="findMatch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="77B-Cj-rAn"/>
                                         </connections>
                                     </button>
-                                    <segmentedControl opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="25a-5q-sPw">
-                                        <rect key="frame" x="133.5" y="0.0" width="61" height="31"/>
-                                        <segments>
-                                            <segment title="P1"/>
-                                            <segment title="P2"/>
-                                        </segments>
-                                        <color key="tintColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <connections>
-                                            <action selector="playerWasSelected:" destination="BYZ-38-t0r" eventType="valueChanged" id="V1k-bk-HU4"/>
-                                        </connections>
-                                    </segmentedControl>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Spieler1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Omm-nN-KI9">
+                                        <rect key="frame" x="133.5" y="0.0" width="60.5" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zWX-oX-xyp">
-                                        <rect key="frame" x="206.5" y="0.0" width="31" height="30"/>
+                                        <rect key="frame" x="206" y="0.0" width="31" height="30"/>
                                         <color key="backgroundColor" red="1" green="0.57637232540000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <state key="normal" title="New"/>
                                         <connections>
@@ -74,7 +112,7 @@
                                         </connections>
                                     </button>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YSM-uX-h4g">
-                                        <rect key="frame" x="249.5" y="0.0" width="64.5" height="30"/>
+                                        <rect key="frame" x="249" y="0.0" width="64.5" height="30"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Score:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c4H-Z4-2Rz">
                                                 <rect key="frame" x="0.0" y="0.0" width="49.5" height="30"/>
@@ -105,10 +143,10 @@
                     </view>
                     <connections>
                         <outlet property="player2Score" destination="YSM-uX-h4g" id="XTh-as-acL"/>
+                        <outlet property="playerName" destination="Omm-nN-KI9" id="tok-hV-Zfy"/>
                         <outlet property="playingCardsView" destination="nux-wO-JbN" id="U4n-Hf-y91"/>
                         <outlet property="scorePlayer1" destination="VMc-pj-84r" id="GJH-dx-rCZ"/>
                         <outlet property="scorePlayer2" destination="3Pp-tg-VU1" id="bqK-SQ-vtV"/>
-                        <outlet property="selectedPlayerControl" destination="25a-5q-sPw" id="lBc-pY-fQ2"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -123,7 +161,28 @@
                     </connections>
                 </rotationGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="115.625" y="121.87499999999999"/>
+            <point key="canvasLocation" x="1111.875" y="121.47887323943662"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Is7-hR-a51">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="FE6-25-sdk" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Zg0-gV-DVP">
+                        <rect key="frame" x="0.0" y="20" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="URa-Aj-ATY" kind="relationship" relationship="rootViewController" id="EFi-WH-Bg7"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="3Iq-6Z-KVX" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-791.25" y="120.4225352112676"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="iaZ-fF-2fa"/>
+    </inferredMetricsTieBreakers>
 </document>

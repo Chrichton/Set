@@ -8,31 +8,22 @@
 
 import UIKit
 
-class ViewController: UIViewController {
-    enum GameType {
-        case onePlayer
-        case twoPlayers
-    }
-    
+class GameViewController: UIViewController {
     @objc
     func touchCard(_ sender: UITapGestureRecognizer) {
         if let tappedView = sender.view {
             let index = tappedView.tag
             game.selectCard(atIndex: index)
-            if scorer.updateScore(player: actualPlayer, for: game) {
-                if timer != nil {
-                    timer?.invalidate()
-                    updateViewFromModel()
-                    timerInterval = minimumTimerInterval
-                    switchPlayers()
-                    let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: UIAlertController.Style.alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .default){ alertAction in
-                        self.timer = self.createSwitchPlayerTimer()
-                    })
-                    self.present(alert, animated: true, completion: nil)
-                } else {
-                    updateViewFromModel()
-                }
+            if game.scorer.hasNewScore && timer != nil {
+                timer?.invalidate()
+                updateViewFromModel()
+                timerInterval = minimumTimerInterval
+                switchPlayers()
+                let alert = UIAlertController(title: "Spielerwechsel", message: self.getPlayerName() + " ist dran", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default){ alertAction in
+                    self.timer = self.createSwitchPlayerTimer()
+                })
+                self.present(alert, animated: true, completion: nil)
             } else {
                 updateViewFromModel()
             }
@@ -56,56 +47,40 @@ class ViewController: UIViewController {
     }
     
     @IBAction func newGame(_ sender: UIButton) {
-        game = createNewGame()
-        updateViewFromModel()
-    }
-    
-    @IBAction func playerWasSelected(_ sender: UISegmentedControl) {
-        if sender.selectedSegmentIndex == 0 {
-            actualPlayer = .playerOne
-        } else {
-            actualPlayer = .playerTwo
-        }
+        createNewGame()
     }
     
     @IBOutlet var playingCardsView: UIView!
+    @IBOutlet var playerName: UILabel!
     @IBOutlet var scorePlayer1: UILabel!
     @IBOutlet var scorePlayer2: UILabel!
-    @IBOutlet var selectedPlayerControl: UISegmentedControl!
     @IBOutlet var player2Score: UIStackView!
     
-    let  minimumTimerInterval = 10.0
-    var game: Game!
-    var grid: Grid?
-    var scorer: TwoPlayerScorer!
-    var actualPlayer = TwoPlayerScorer.Player.playerOne
-    var timerInterval: Double!
-    weak var timer: Timer?
-    var gameType: GameType!
+    var numberOfPlayers: Int!
     
-    private func createNewGame() -> Game {
+    private let  minimumTimerInterval = 10.0
+    private var game: Game!
+    private var grid: Grid?
+    private var timerInterval: Double!
+    private weak var timer: Timer?
+    
+    private func createNewGame() {
         timer?.invalidate()
-        let newGame = Game()
-        scorer = TwoPlayerScorer()
         grid = createGrid()
         timerInterval = minimumTimerInterval
+        self.player2Score.isHidden = numberOfPlayers == 1
         
-        let alert = UIAlertController(title: "Anzahl Spieler", message: "Wieviele Spieler nehmen teil?", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "1", style: .cancel) { alertAction in
-            self.gameType = .onePlayer
-            self.actualPlayer = .playerOne
-            self.selectedPlayerControl.isHidden = true
-            self.player2Score.isHidden = true
-        })
-        alert.addAction(UIAlertAction(title: "2", style: .default) { alertAction in
-            self.gameType = .twoPlayers
-            self.selectedPlayerControl.isHidden = false
-            self.player2Score.isHidden = false
+        game = Game(numberOfPlayers: numberOfPlayers)
+        
+        playerName.text = getPlayerName()
+        updateViewFromModel()
+        if numberOfPlayers > 1 {
             self.timer = self.createSwitchPlayerTimer()
-        })
-        self.present(alert, animated: true, completion: nil)
-        
-        return newGame
+        }
+    }
+    
+    private func getPlayerName() -> String {
+        return "\(self.game.players.current()?.name ?? "?")"
     }
     
     private func createSwitchPlayerTimer() -> Timer {
@@ -114,12 +89,7 @@ class ViewController: UIViewController {
             self.timerInterval *= 2
             DispatchQueue.main.async {
                 self.playingCardsView.isHidden = true
-                if self.selectedPlayerControl.selectedSegmentIndex == 0 {
-                    self.selectedPlayerControl.selectedSegmentIndex = 1
-                } else {
-                    self.selectedPlayerControl.selectedSegmentIndex = 0
-                }
-                let alert = UIAlertController(title: "Spielerwechsel", message: "\(self.actualPlayer.rawValue) ist dran", preferredStyle: .alert)
+                let alert = UIAlertController(title: "Spielerwechsel", message: self.getPlayerName() + " ist dran", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default) { alertAction in
                         self.playingCardsView.isHidden = false
                         self.timer = self.createSwitchPlayerTimer()
@@ -131,13 +101,17 @@ class ViewController: UIViewController {
         return newTimer
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        game = createNewGame()
-        updateViewFromModel()
+        createNewGame()
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        timer?.invalidate()
+        super.viewWillDisappear(animated)
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -159,8 +133,8 @@ class ViewController: UIViewController {
     private func updateViewFromModel() {
         removePlayingCardViews()
         grid?.cellCount = game.cards.count
-        scorePlayer1.text = String(format: "%2d", scorer.PlayerOneScore)
-        scorePlayer2.text = String(format: "%2d", scorer.PlayerTwoScore)
+        scorePlayer1.text = String(format: "%2d", game.players.getValue(atIndex: 0)?.score ?? "?")
+        scorePlayer2.text = String(format: "%2d", game.players.getValue(atIndex: 1)?.score ?? "?")
         
         for (index, card) in game.cards.enumerated() {
             if let frame = grid?[index] {
@@ -201,12 +175,8 @@ class ViewController: UIViewController {
     }
     
     private func switchPlayers() {
-        switch actualPlayer {
-        case .playerOne:
-            actualPlayer = .playerTwo
-        case .playerTwo:
-            actualPlayer = .playerOne
-        }
+        game.nextPlayer()
+        playerName.text = getPlayerName()
     }
     
     private func removePlayingCardViews() {
@@ -223,7 +193,6 @@ class ViewController: UIViewController {
             if let matchingCards = self.game.findMatchingCards() {
                 DispatchQueue.main.async {
                     self.game.selectMatchingCards(matchingCards)
-                    let _ = self.scorer.updateScore(player: self.actualPlayer, for: self.game)
                     self.updateViewFromModel()
                 }
             }
