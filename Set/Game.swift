@@ -57,42 +57,26 @@ struct Game {
     }
     
     mutating func selectCard(atIndex: Int) {
+        assert(selectedCards.count < 3)
+        
         let selectedCard = cards[atIndex]
-        if selectedCards.count < 2 {
-            if let index = selectedCards.index(of: selectedCard) {
-                selectedCards.remove(at: index)
-            } else {
-                selectedCards.append(selectedCard)
-            }
-        } else if selectedCards.count == 2 {
-            if let index = selectedCards.index(of: selectedCard) {
-                selectedCards.remove(at: index)
-            } else {
-                selectedCards.append(selectedCard)
+        if let index = selectedCards.index(of: selectedCard) {
+            selectedCards.remove(at: index)
+        } else {
+            selectedCards.append(selectedCard)
+            if selectedCards.count == 3 {
                 let match = isMatch(card1: selectedCards[0], card2: selectedCards[1], card3: selectedCards[2])
                 if match {
                     matchedCards.append(contentsOf: selectedCards)
                 }
             }
-        } else {
-            if !selectedCards.contains(selectedCard) {
-                if matchedCards.contains(selectedCards[0]) && matchedCards.contains(selectedCards[1]) && matchedCards.contains(selectedCards[2]) {
-                    for card in selectedCards {
-                        if let index = cards.index(of: card) {
-                            cards.remove(at: index)
-                            if !remainingDeck.isEmpty && cards.count < noOfCardsAtStart {
-                                let remainingCard = remainingDeck.remove(at: 0)
-                                cards.insert(remainingCard, at: index)
-                            }
-                        }
-                    }
-                }
-                selectedCards.removeAll()
-                selectedCards.append(selectedCard)
-            }
         }
         
         updateScore()
+    }
+    
+    mutating func deSelectCards() {
+        selectedCards.removeAll()
     }
     
     mutating func selectMatchingCards(_ matchingCards: MatchingCards)  {
@@ -121,10 +105,24 @@ struct Game {
     }
     
     mutating func deal3Cards() {
-        for _ in 1...3 {
-            if !remainingDeck.isEmpty {
-                let card = remainingDeck.remove(at: 0)
-                cards.append(card)
+        if selectedCards.count == 3 &&
+            matchedCards.contains(selectedCards[0]) && matchedCards.contains(selectedCards[1]) && matchedCards.contains(selectedCards[2]) {
+            for card in selectedCards {
+                if let index = cards.index(of: card) {
+                    cards.remove(at: index)
+                    if !remainingDeck.isEmpty && cards.count < noOfCardsAtStart {
+                        let remainingCard = remainingDeck.remove(at: 0)
+                        cards.insert(remainingCard, at: index)
+                    }
+                }
+            }
+            selectedCards.removeAll()
+        } else {
+            for _ in 1...3 {
+                if !remainingDeck.isEmpty {
+                    let card = remainingDeck.remove(at: 0)
+                    cards.append(card)
+                }
             }
         }
     }

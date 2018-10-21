@@ -11,22 +11,10 @@ import UIKit
 class GameViewController: UIViewController {
     @objc
     func touchCard(_ sender: UITapGestureRecognizer) {
-        if let tappedView = sender.view {
+        if !inAnimation, let tappedView = sender.view {
             let index = tappedView.tag
             game.selectCard(atIndex: index)
-            if game.scorer.hasNewScore && timer != nil {
-                timer?.invalidate()
-                updateViewFromModel()
-                timerInterval = minimumTimerInterval
-                switchPlayers()
-                let alert = UIAlertController(title: "Spielerwechsel", message: self.getPlayerName() + " ist dran", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default){ alertAction in
-                    self.timer = self.createSwitchPlayerTimer()
-                })
-                self.present(alert, animated: true, completion: nil)
-            } else {
-                updateViewFromModel()
-            }
+            updateViewFromModel()
         }
     }
    
@@ -35,8 +23,7 @@ class GameViewController: UIViewController {
     }
     
     @IBAction func deal3Cards(_ sender: UISwipeGestureRecognizer) {
-        game.deal3Cards()
-        updateViewFromModel()
+       deal3Cards()
     }
     
     @IBAction func shuffleCards(_ sender: UIRotationGestureRecognizer) {
@@ -62,7 +49,34 @@ class GameViewController: UIViewController {
     private var game: Game!
     private var grid: Grid?
     private var timerInterval: Double!
-    private weak var timer: Timer?
+    private weak var timer: PauseableTimer?
+    private var inAnimation = false
+    
+    private func deal3Cards() {
+        game.deal3Cards()
+        updateViewFromModel()
+    }
+    
+    private func deSelectCards() {
+        game.deSelectCards()
+        updateViewFromModel()
+    }
+    
+    private func matchShown() {
+        if game.players.count > 1 {
+            timer?.invalidate()
+            timerInterval = minimumTimerInterval
+            switchPlayers()
+            let alert = UIAlertController(title: "Spielerwechsel", message: self.getPlayerName() + " ist dran", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default){ alertAction in
+                self.deal3Cards()
+                self.timer = self.createSwitchPlayerTimer()
+            })
+            self.present(alert, animated: true, completion: nil)
+        } else {
+            deal3Cards()
+        }
+    }
     
     private func createNewGame() {
         timer?.invalidate()
@@ -75,7 +89,7 @@ class GameViewController: UIViewController {
         playerName.text = getPlayerName()
         updateViewFromModel()
         if numberOfPlayers > 1 {
-            self.timer = self.createSwitchPlayerTimer()
+            timer = createSwitchPlayerTimer()
         }
     }
     
@@ -83,12 +97,14 @@ class GameViewController: UIViewController {
         return "\(self.game.players.current()?.name ?? "?")"
     }
     
-    private func createSwitchPlayerTimer() -> Timer {
+    private func createSwitchPlayerTimer() -> PauseableTimer {
         let newTimer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: false) { timer in
-            self.switchPlayers()
+            self.timer?.invalidate()
             self.timerInterval *= 2
             DispatchQueue.main.async {
                 self.playingCardsView.isHidden = true
+                self.switchPlayers()
+                self.deSelectCards()
                 let alert = UIAlertController(title: "Spielerwechsel", message: self.getPlayerName() + " ist dran", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default) { alertAction in
                         self.playingCardsView.isHidden = false
@@ -98,7 +114,7 @@ class GameViewController: UIViewController {
             }
         }
         
-        return newTimer
+        return PauseableTimer(timer: newTimer)
     }
     
     override func viewDidLoad() {
@@ -136,6 +152,9 @@ class GameViewController: UIViewController {
         scorePlayer1.text = String(format: "%2d", game.players.getValue(atIndex: 0)?.score ?? "?")
         scorePlayer2.text = String(format: "%2d", game.players.getValue(atIndex: 1)?.score ?? "?")
         
+        var matchedCardViews = [PlayingCardView]()
+        var unMatchedCardViews = [PlayingCardView]()
+        
         for (index, card) in game.cards.enumerated() {
             if let frame = grid?[index] {
                 let cardView = PlayingCardView(frame: frame.insetBy(dx: 3, dy: 3))
@@ -158,9 +177,12 @@ class GameViewController: UIViewController {
                 
                 if game.selectedCards.contains(card) {
                     if game.matchedCards.contains(card) {
-                        cardView.cardColor = #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)
+                        matchedCardViews.append(cardView)
                     } else {
                         cardView.cardColor = #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)
+                        if game.selectedCards.count == 3 {
+                            unMatchedCardViews.append(cardView)
+                        }
                     }
                 } else {
                     cardView.cardColor = UIColor.white
@@ -171,6 +193,56 @@ class GameViewController: UIViewController {
                 cardView.tag = index
                 playingCardsView.addSubview(cardView)
             }
+        }
+        
+        for (index, cardView) in matchedCardViews.enumerated() {
+            inAnimation = true
+            timer?.invalidate()
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: 0.65,
+                delay: 0,
+                options: [],
+                animations: { cardView.transform = CGAffineTransform.identity.scaledBy(x: 1.5, y: 1.5) },
+                completion: { position in
+                    UIViewPropertyAnimator.runningPropertyAnimator(
+                        withDuration: 0.75,
+                        delay: 0,
+                        options: [],
+                        animations: {
+                            cardView.transform = CGAffineTransform.identity.scaledBy(x: 0.1, y: 0.1)
+                            cardView.alpha = 0
+                        },
+                        completion: {
+                            position in
+                            if index == 0 {
+                                self.inAnimation = false
+                                self.matchShown()
+                            }
+                        }
+                    )
+                }
+            )
+        }
+        
+        for (index, cardView) in unMatchedCardViews.enumerated() {
+            inAnimation = true
+            timer?.pause()
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: 1.5,
+                delay: 0,
+                options: [],
+                animations: {
+                    cardView.alpha = 0.7
+                },
+                completion: {
+                    position in
+                    if index == 0 {
+                        self.inAnimation = false
+                        self.timer?.resume()
+                        self.deSelectCards()
+                    }
+                }
+            )
         }
     }
     

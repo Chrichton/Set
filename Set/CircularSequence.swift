@@ -14,6 +14,10 @@ struct CircularSequence<T>: IteratorProtocol {
         position = 0
     }
     
+    var count: Int {
+        return buffer.count
+    }
+    
     mutating func next() -> T? {
         if buffer.isEmpty { return nil }
         

@@ -63,6 +63,7 @@
                         <subviews>
                             <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="nux-wO-JbN">
                                 <rect key="frame" x="16" y="64" width="288" height="434"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <gestureRecognizers/>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="fuT-wy-aOm" appends="YES" id="YB7-DD-mvE"/>
@@ -131,6 +132,7 @@
                                 </subviews>
                             </stackView>
                         </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="nux-wO-JbN" secondAttribute="trailing" constant="16" id="2jY-Ke-gFd"/>
                             <constraint firstItem="wKi-aE-qts" firstAttribute="top" secondItem="nux-wO-JbN" secondAttribute="bottom" constant="20" id="4eY-gK-J6K"/>

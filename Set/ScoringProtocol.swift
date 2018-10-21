@@ -10,5 +10,4 @@ import Foundation
 
 protocol ScoringProtocol {
     mutating func getNewScore(for game: Game) -> Int?
-    var hasNewScore: Bool {get} 
 }

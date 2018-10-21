@@ -186,4 +186,16 @@ extension Card.CardColors {
         drawCardBackground(rect)
         drawSymbol(rect: rect)
     }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0)
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        
+        backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0)
+    }
 }
