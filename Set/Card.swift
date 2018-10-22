@@ -31,5 +31,13 @@ struct Card: Equatable {
     let rank: Int
     let symbol: CardSymbols
     let shading: CardShadings
+    var isNew = true
+    
+    init(color: CardColors, rank: Int, symbol: CardSymbols, shading: CardShadings) {
+        self.color = color
+        self.rank = rank
+        self.symbol = symbol
+        self.shading = shading
+    }
 }
 

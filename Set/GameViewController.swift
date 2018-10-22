@@ -62,6 +62,26 @@ class GameViewController: UIViewController {
         updateViewFromModel()
     }
     
+    private func moveCardView(_ cardView: PlayingCardView, from: CGRect, to: CGRect) {
+        cardView.frame = from
+        UIViewPropertyAnimator.runningPropertyAnimator(
+            withDuration: 1.5,
+            delay: 0,
+            options: [],
+            animations: { cardView.frame = to },
+            completion: { _ in
+                UIView.transition(with: cardView,
+                                  duration: 0.5,
+                                  options: [.transitionFlipFromRight],
+                                  animations: {
+                                    cardView.isFaceUp = true
+                                    cardView.setNeedsDisplay()
+                                    }
+                )
+            }
+        )
+    }
+    
     private func matchShown() {
         if game.players.count > 1 {
             timer?.invalidate()
@@ -117,8 +137,8 @@ class GameViewController: UIViewController {
         return PauseableTimer(timer: newTimer)
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
         createNewGame()
     }
@@ -192,6 +212,11 @@ class GameViewController: UIViewController {
                 cardView.addGestureRecognizer(tapGestureRecognizer)
                 cardView.tag = index
                 playingCardsView.addSubview(cardView)
+                
+                cardView.isFaceUp = !card.isNew
+                if card.isNew {
+                    moveCardView(cardView, from: CGRect(origin: CGPoint(x: 0, y: 0), size: cardView.frame.size), to: cardView.frame)
+                }
             }
         }
         

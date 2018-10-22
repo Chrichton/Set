@@ -41,6 +41,8 @@ extension Card.CardColors {
 // suitColor als enum
 
 @IBDesignable class PlayingCardView: UIView {
+    @IBInspectable var isFaceUp: Bool = false
+    @IBInspectable var cardFaceDownColor: UIColor = UIColor.red
     @IBInspectable var cardColor: UIColor = UIColor.white
     @IBInspectable var suitColor: UIColor = UIColor.red
     @IBInspectable var suitAdapter: Int {
@@ -175,16 +177,28 @@ extension Card.CardColors {
         }
     }
     
-    fileprivate func drawCardBackground(_ rect: CGRect) {
+    private func drawCardBackground(_ rect: CGRect) {
         let roundedRect = UIBezierPath(roundedRect: rect, cornerRadius: 20)
         roundedRect.addClip()
-        cardColor.setFill()
+        if isFaceUp {
+            cardColor.setFill()
+        } else {
+            cardFaceDownColor.setFill()
+        }
         roundedRect.fill()
+        
+        if !isFaceUp {
+            roundedRect.lineWidth = 3
+            UIColor.black.setStroke()
+            roundedRect.stroke()
+        }
     }
     
     override func draw(_ rect: CGRect) {
         drawCardBackground(rect)
-        drawSymbol(rect: rect)
+        if isFaceUp {
+            drawSymbol(rect: rect)
+        }
     }
     
     override init(frame: CGRect) {

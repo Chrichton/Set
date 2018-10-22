@@ -17,6 +17,7 @@ struct Game {
     private (set) var scorer: ScoringProtocol
     private (set) var players = CircularSequence<Player>()
     
+    private var hasNewCards = true
     private var remainingDeck = [Card]()
     private let noOfCardsAtStart = 12
     
@@ -56,8 +57,19 @@ struct Game {
         }
     }
     
+    private mutating func updateNewCards() {
+        if hasNewCards {
+            for (index, _) in cards.enumerated() {
+                cards[index].isNew = false
+            }
+            hasNewCards = false
+        }
+    }
+    
     mutating func selectCard(atIndex: Int) {
         assert(selectedCards.count < 3)
+        
+        updateNewCards()
         
         let selectedCard = cards[atIndex]
         if let index = selectedCards.index(of: selectedCard) {
@@ -88,6 +100,7 @@ struct Game {
     }
     
     mutating func findMatchingCards() -> MatchingCards? {
+        updateNewCards()
         for index1 in 0 ..< cards.count - 2 {
             for index2 in index1 + 1 ..< cards.count - 1 {
                 for index3 in index2 + 1 ..< cards.count {
@@ -105,6 +118,7 @@ struct Game {
     }
     
     mutating func deal3Cards() {
+        updateNewCards()
         if selectedCards.count == 3 &&
             matchedCards.contains(selectedCards[0]) && matchedCards.contains(selectedCards[1]) && matchedCards.contains(selectedCards[2]) {
             for card in selectedCards {
@@ -113,6 +127,7 @@ struct Game {
                     if !remainingDeck.isEmpty && cards.count < noOfCardsAtStart {
                         let remainingCard = remainingDeck.remove(at: 0)
                         cards.insert(remainingCard, at: index)
+                        hasNewCards = true
                     }
                 }
             }
@@ -122,6 +137,7 @@ struct Game {
                 if !remainingDeck.isEmpty {
                     let card = remainingDeck.remove(at: 0)
                     cards.append(card)
+                    hasNewCards = true
                 }
             }
         }
@@ -137,6 +153,7 @@ struct Game {
         cards.removeAll()
         while cards.count < cardsDrawn {
             cards.append(remainingDeck.remove(at: 0))
+            hasNewCards = true
         }
     }
     
