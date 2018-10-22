@@ -213,8 +213,9 @@ class GameViewController: UIViewController {
                 cardView.tag = index
                 playingCardsView.addSubview(cardView)
                 
-                cardView.isFaceUp = !card.isNew
-                if card.isNew {
+                let isNewCard = game.newCards.contains(card)
+                cardView.isFaceUp = !isNewCard
+                if isNewCard {
                     moveCardView(cardView, from: CGRect(origin: CGPoint(x: 0, y: 0), size: cardView.frame.size), to: cardView.frame)
                 }
             }

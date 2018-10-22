@@ -14,6 +14,7 @@ struct Game {
     private (set) var cards = [Card]()
     private (set) var selectedCards = [Card]()
     private (set) var matchedCards  = [Card]()
+    private (set) var newCards  = [Card]()
     private (set) var scorer: ScoringProtocol
     private (set) var players = CircularSequence<Player>()
     
@@ -33,12 +34,11 @@ struct Game {
             }
         }
         
-        
         scorer = TwoPlayerScorer()
         
         remainingDeck = shuffleCards(remainingDeck)
         for _ in 1...noOfCardsAtStart {
-            cards.append(remainingDeck.remove(at: 0))
+            appendCard(remainingDeck.remove(at: 0))
         }
         
         for playerNumber in 1...numberOfPlayers {
@@ -50,6 +50,18 @@ struct Game {
         let _ = players.next()
     }
     
+    private mutating func appendCard(_ newCard: Card) {
+        cards.append(newCard)
+        newCards.append(newCard)
+        hasNewCards = true
+    }
+
+    private mutating func insertCard(_ newCard: Card, at: Int) {
+        cards.insert(newCard, at: at)
+        newCards.append(newCard)
+        hasNewCards = true
+    }
+    
     private mutating func updateScore() {
         if let newScore = scorer.getNewScore(for: self), let player = players.current() {
             let newPlayer = Player(name: player.name, score: player.score + newScore)
@@ -59,9 +71,7 @@ struct Game {
     
     private mutating func updateNewCards() {
         if hasNewCards {
-            for (index, _) in cards.enumerated() {
-                cards[index].isNew = false
-            }
+            newCards.removeAll()
             hasNewCards = false
         }
     }
@@ -126,8 +136,7 @@ struct Game {
                     cards.remove(at: index)
                     if !remainingDeck.isEmpty && cards.count < noOfCardsAtStart {
                         let remainingCard = remainingDeck.remove(at: 0)
-                        cards.insert(remainingCard, at: index)
-                        hasNewCards = true
+                        insertCard(remainingCard, at: index)
                     }
                 }
             }
@@ -136,8 +145,7 @@ struct Game {
             for _ in 1...3 {
                 if !remainingDeck.isEmpty {
                     let card = remainingDeck.remove(at: 0)
-                    cards.append(card)
-                    hasNewCards = true
+                    appendCard(card)
                 }
             }
         }
@@ -152,8 +160,7 @@ struct Game {
         remainingDeck = shuffleCards(cards + remainingDeck)
         cards.removeAll()
         while cards.count < cardsDrawn {
-            cards.append(remainingDeck.remove(at: 0))
-            hasNewCards = true
+            appendCard(remainingDeck.remove(at: 0))
         }
     }
     
